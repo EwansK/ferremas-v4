@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Override for development - mount source code for hot reload
+  auth-service:
+    command: npm run dev
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+
+  product-service:
+    command: npm run dev
+    volumes:
+      - ./services/product-service:/app
+      - /app/node_modules
+
+  manager-service:
+    command: npm run dev
+    volumes:
+      - ./services/manager-service:/app
+      - /app/node_modules
+      - uploads_data:/app/uploads
+
+  admin-service:
+    command: npm run dev
+    volumes:
+      - ./services/admin-service:/app
+      - /app/node_modules
+
+  api-gateway:
+    command: npm run dev
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+      - uploads_data:/app/uploads
+
+  frontend:
+    command: npm run dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next

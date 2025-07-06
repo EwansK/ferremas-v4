@@ -1,0 +1,19 @@
+{
+  "name": "ferremas-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for Ferremas e-commerce platform",
+  "main": "index.js",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "test:e2e:headed": "cypress run --headed"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "@testing-library/cypress": "^10.0.1"
+  },
+  "keywords": ["e2e", "testing", "cypress"],
+  "author": "Ferremas",
+  "license": "MIT"
+}

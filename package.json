@@ -1,0 +1,35 @@
+{
+  "name": "ferremas-v4",
+  "version": "1.0.0",
+  "description": "Ferremas e-commerce platform with microservices architecture",
+  "scripts": {
+    "test:all": "npm run test:auth && npm run test:products && npm run test:manager && npm run test:admin && npm run test:frontend",
+    "test:auth": "cd services/auth-service && npm test",
+    "test:products": "cd services/product-service && npm test",
+    "test:manager": "cd services/manager-service && npm test",
+    "test:admin": "cd services/admin-service && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:coverage": "npm run test:auth -- --coverage && npm run test:products -- --coverage && npm run test:manager -- --coverage && npm run test:admin -- --coverage && npm run test:frontend -- --coverage",
+    "test:e2e": "cd e2e-tests && npm run cypress:run",
+    "test:e2e:open": "cd e2e-tests && npm run cypress:open",
+    "test:install": "npm run install:auth && npm run install:products && npm run install:manager && npm run install:admin && npm run install:frontend && npm run install:e2e",
+    "install:auth": "cd services/auth-service && npm install",
+    "install:products": "cd services/product-service && npm install",
+    "install:manager": "cd services/manager-service && npm install",
+    "install:admin": "cd services/admin-service && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:e2e": "cd e2e-tests && npm install",
+    "dev": "docker-compose up -d",
+    "dev:down": "docker-compose down",
+    "dev:logs": "docker-compose logs -f",
+    "test:setup": "docker-compose -f docker-compose.test.yml up -d",
+    "test:teardown": "docker-compose -f docker-compose.test.yml down"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "pg": "^8.16.2"
+  },
+  "keywords": ["e-commerce", "microservices", "nodejs", "react", "postgresql"],
+  "author": "Ferremas",
+  "license": "MIT"
+}
