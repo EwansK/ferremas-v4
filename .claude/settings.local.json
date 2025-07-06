@@ -45,7 +45,9 @@
       "Bash(git init:*)",
       "Bash(/dev/null)",
       "Bash(git add:*)",
-      "Bash(git count-objects:*)"
+      "Bash(git count-objects:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
