@@ -19,17 +19,7 @@ import {
 
 // Import the user edit form
 import UserEditForm from '@/components/admin/UserEditForm';
-
-interface User {
-  id: string;
-  name: string;
-  lastname: string;
-  email: string;
-  role: 'customer' | 'manager' | 'admin';
-  is_active: boolean;
-  created_at: string;
-  last_login?: string;
-}
+import type { User, ApiUser } from '@/types';
 
 interface UserFilters {
   search: string;
@@ -79,7 +69,7 @@ export default function UsersManagement() {
       const result = await apiClient.getUsers(apiFilters);
       
       // Transform the data to match our interface
-      const transformedUsers: User[] = result.users.map((user: any) => ({
+      const transformedUsers: User[] = result.users.map((user: ApiUser) => ({
         id: user.id,
         name: user.name,
         lastname: user.lastname,
@@ -407,7 +397,7 @@ export default function UsersManagement() {
                           {userData.last_login ? formatTime(userData.last_login) : 'Nunca'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(userData.created_at)}
+                          {userData.created_at ? formatDate(userData.created_at) : 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">

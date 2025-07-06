@@ -13,6 +13,9 @@ import type {
   UpdateProductData,
   CreateCategoryData,
   UpdateCategoryData,
+  UsersResponse,
+  UserResponse,
+  UpdateUserData,
 } from '@/types';
 
 class ApiClient {
@@ -279,7 +282,7 @@ class ApiClient {
   }
 
   // Admin API - User Management
-  async getUsers(filters?: { page?: number; limit?: number; search?: string; role?: string }): Promise<{ users: any[]; pagination: any }> {
+  async getUsers(filters?: { page?: number; limit?: number; search?: string; role?: string }): Promise<UsersResponse> {
     try {
       const params = new URLSearchParams();
       if (filters) {
@@ -290,25 +293,25 @@ class ApiClient {
         });
       }
       
-      const response = await this.client.get<ApiResponse<{ users: any[]; pagination: any }>>(`/api/admin/users?${params}`);
+      const response = await this.client.get<ApiResponse<UsersResponse>>(`/api/admin/users?${params}`);
       return this.handleResponse(response);
     } catch (error) {
       this.handleError(error as AxiosError);
     }
   }
 
-  async getUserById(id: string): Promise<{ user: any; activitySummary?: any }> {
+  async getUserById(id: string): Promise<UserResponse> {
     try {
-      const response = await this.client.get<ApiResponse<{ user: any; activitySummary?: any }>>(`/api/admin/users/${id}`);
+      const response = await this.client.get<ApiResponse<UserResponse>>(`/api/admin/users/${id}`);
       return this.handleResponse(response);
     } catch (error) {
       this.handleError(error as AxiosError);
     }
   }
 
-  async updateUser(id: string, userData: { name?: string; lastname?: string; email?: string; role?: string; active?: boolean }): Promise<{ user: any }> {
+  async updateUser(id: string, userData: UpdateUserData): Promise<UserResponse> {
     try {
-      const response = await this.client.put<ApiResponse<{ user: any }>>(`/api/admin/users/${id}`, userData);
+      const response = await this.client.put<ApiResponse<UserResponse>>(`/api/admin/users/${id}`, userData);
       return this.handleResponse(response);
     } catch (error) {
       this.handleError(error as AxiosError);
@@ -323,9 +326,9 @@ class ApiClient {
     }
   }
 
-  async reactivateUser(id: string): Promise<{ user: any }> {
+  async reactivateUser(id: string): Promise<UserResponse> {
     try {
-      const response = await this.client.post<ApiResponse<{ user: any }>>(`/api/admin/users/${id}/reactivate`);
+      const response = await this.client.post<ApiResponse<UserResponse>>(`/api/admin/users/${id}/reactivate`);
       return this.handleResponse(response);
     } catch (error) {
       this.handleError(error as AxiosError);

@@ -16,10 +16,57 @@ export interface User {
   lastname: string;
   email: string;
   role: 'customer' | 'manager' | 'admin';
-  active: boolean;
+  is_active: boolean;
   created_at?: string;
+  last_login?: string;
 }
 
+// Backend API User data structure (from the actual API response)
+export interface ApiUser {
+  id: string;
+  name: string;
+  lastname: string;
+  email: string;
+  role: 'customer' | 'manager' | 'admin';
+  active: boolean; // Backend uses 'active', frontend uses 'is_active'
+  created_at?: string;
+  last_login?: string;
+}
+// Backend API User data structure (from the actual API response)
+  export interface ApiUser {
+    id: string;
+    name: string;
+    lastname: string;
+    email: string;
+    role: 'customer' | 'manager' | 'admin';
+    active: boolean; // Backend uses 'active', frontend uses 'is_active'
+    created_at?: string;
+    last_login?: string;
+  }
+
+  export interface UsersResponse {
+    users: ApiUser[];
+    pagination: Pagination;
+  }
+
+  export interface UserResponse {
+    user: User;
+    activitySummary?: ActivitySummary;
+  }
+
+  export interface ActivitySummary {
+    lastLogin?: string;
+    totalLogins?: number;
+    activitiesCount?: number;
+  }
+
+  export interface UpdateUserData {
+    name?: string;
+    lastname?: string;
+    email?: string;
+    role?: string;
+    active?: boolean;
+  }
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
@@ -113,6 +160,40 @@ export interface CreateCategoryData {
 
 export interface UpdateCategoryData {
   name: string;
+}
+
+// Pagination Types
+export interface Pagination {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface UsersResponse {
+  users: ApiUser[];
+  pagination: Pagination;
+}
+
+export interface UserResponse {
+  user: User;
+  activitySummary?: ActivitySummary;
+}
+
+export interface ActivitySummary {
+  lastLogin?: string;
+  totalLogins?: number;
+  activitiesCount?: number;
+}
+
+export interface UpdateUserData {
+  name?: string;
+  lastname?: string;
+  email?: string;
+  role?: string;
+  active?: boolean;
 }
 
 // API Error Types
