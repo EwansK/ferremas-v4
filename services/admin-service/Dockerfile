@@ -6,7 +6,8 @@ WORKDIR /app
 
 # Install dependencies first (for better caching)
 COPY package*.json ./
-RUN npm ci --only=production
+ARG NODE_ENV=production
+RUN if [ "$NODE_ENV" = "development" ] ; then npm ci ; else npm ci --only=production ; fi
 
 # Copy source code and shared middleware
 COPY src/ ./src/

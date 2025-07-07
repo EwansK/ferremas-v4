@@ -16,15 +16,36 @@ class CorsMiddleware {
    */
   parseAllowedOrigins() {
     const defaultOrigins = [
-      'http://localhost:3000',  // API Gateway
-      'http://localhost:3001',  // Frontend
-      'http://localhost:3005',  // Auth Service (external port)
+      'http://localhost:3000',  // API Gateway (local dev)
+      'http://localhost:3001',  // Frontend (local dev)
+      'http://localhost:3005',  // Auth Service (local dev)
     ];
 
     if (process.env.CORS_ORIGIN) {
       // Support both single origin and comma-separated list
       const origins = process.env.CORS_ORIGIN.split(',').map(origin => origin.trim());
       return origins.length > 0 ? origins : defaultOrigins;
+    }
+
+    // In production, check for common AWS environment variables
+    if (process.env.NODE_ENV === 'production') {
+      const productionOrigins = [];
+      
+      // Add AWS ALB/CloudFront URLs if available
+      if (process.env.AWS_FRONTEND_URL) {
+        productionOrigins.push(process.env.AWS_FRONTEND_URL);
+      }
+      if (process.env.AWS_API_URL) {
+        productionOrigins.push(process.env.AWS_API_URL);
+      }
+      
+      // Add custom domain if available
+      if (process.env.CUSTOM_DOMAIN) {
+        productionOrigins.push(`https://${process.env.CUSTOM_DOMAIN}`);
+        productionOrigins.push(`https://www.${process.env.CUSTOM_DOMAIN}`);
+      }
+      
+      return productionOrigins.length > 0 ? productionOrigins : defaultOrigins;
     }
 
     return defaultOrigins;

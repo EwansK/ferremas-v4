@@ -66,7 +66,14 @@
       "Bash(-e NEXT_PUBLIC_API_URL=http://localhost:3000 )",
       "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/src:/app/src )",
       "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/public:/app/public )",
-      "Bash(--restart unless-stopped )"
+      "Bash(--restart unless-stopped )",
+      "Bash(docker stop:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker network:*)",
+      "Bash(docker container prune:*)",
+      "Bash(docker image:*)",
+      "Bash(docker volume prune:*)",
+      "Bash(docker:*)"
     ],
     "deny": []
   }

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -40,7 +38,10 @@ services:
       DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
-      CORS_ORIGIN: http://localhost:3005
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
     ports:
       - "3005:3001"
     depends_on:
@@ -67,7 +68,10 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres123
       DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
       AUTH_SERVICE_URL: http://auth-service:3001
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
     ports:
@@ -96,7 +100,10 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres123
       DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
-      CORS_ORIGIN: http://localhost:3001
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
       AUTH_SERVICE_URL: http://auth-service:3001
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       UPLOAD_PATH: /app/uploads
@@ -128,7 +135,10 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres123
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      CORS_ORIGIN: http://localhost:3000
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
       AUTH_SERVICE_URL: http://auth-service:3001
     ports:
       - "3004:3004"
@@ -154,7 +164,10 @@ services:
       PRODUCT_SERVICE_URL: http://product-service:3002
       MANAGER_SERVICE_URL: http://manager-service:3003
       ADMIN_SERVICE_URL: http://admin-service:3004
-      CORS_ORIGIN: http://localhost:3001
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
     ports:
       - "3000:3000"

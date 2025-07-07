@@ -27,10 +27,10 @@ class ApiClient {
     const isServer = typeof window === 'undefined';
     
     if (isServer) {
-      // Server-side: use internal Docker service name
-      this.baseURL = 'http://api-gateway:3000';
+      // Server-side: use internal Docker service name for local dev, AWS internal URL for production
+      this.baseURL = process.env.AWS_INTERNAL_API_URL || 'http://api-gateway:3000';
     } else {
-      // Client-side: use public URL
+      // Client-side: use public URL (AWS ALB/CloudFront or localhost)
       this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     }
     
