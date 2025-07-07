@@ -75,7 +75,7 @@ export default function UsersManagement() {
         lastname: user.lastname,
         email: user.email,
         role: user.role,
-        is_active: user.active, // Backend uses 'active', frontend uses 'is_active'
+        active: user.active,
         created_at: user.created_at,
         last_login: user.last_login
       }));
@@ -84,7 +84,7 @@ export default function UsersManagement() {
       let filteredUsers = transformedUsers;
       if (filters.status) {
         const isActive = filters.status === 'active';
-        filteredUsers = filteredUsers.filter(user => user.is_active === isActive);
+        filteredUsers = filteredUsers.filter(user => user.active === isActive);
       }
 
       setUsers(filteredUsers);
@@ -376,11 +376,11 @@ export default function UsersManagement() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            userData.is_active 
+                            userData.active 
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-red-100 text-red-800'
                           }`}>
-                            {userData.is_active ? (
+                            {userData.active ? (
                               <>
                                 <CheckCircleIcon className="h-3 w-3 mr-1" />
                                 Activo
@@ -409,17 +409,17 @@ export default function UsersManagement() {
                               <PencilIcon className="h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => handleToggleUserStatus(userData.id, userData.is_active)}
+                              onClick={() => handleToggleUserStatus(userData.id, userData.active)}
                               disabled={processingUser === userData.id}
                               className={`${
-                                userData.is_active 
+                                userData.active 
                                   ? 'text-red-600 hover:text-red-900' 
                                   : 'text-green-600 hover:text-green-900'
                               } disabled:opacity-50`}
                             >
                               {processingUser === userData.id ? (
                                 <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-current"></div>
-                              ) : userData.is_active ? (
+                              ) : userData.active ? (
                                 <XCircleIcon className="h-4 w-4" />
                               ) : (
                                 <CheckCircleIcon className="h-4 w-4" />

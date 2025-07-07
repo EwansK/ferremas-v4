@@ -47,7 +47,26 @@
       "Bash(git add:*)",
       "Bash(git count-objects:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm run:*)",
+      "Bash(docker image rm:*)",
+      "Bash(docker run:*)",
+      "Bash(--name ferremas-frontend-temp )",
+      "Bash(--network ferremas-v4_ferremas-network )",
+      "Bash(-p 3001:3000 )",
+      "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/src:/app/src )",
+      "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/public:/app/public )",
+      "Bash(-e NODE_ENV=development )",
+      "Bash(-e NEXT_PUBLIC_API_URL=http://localhost:3000 )",
+      "Bash(ferremas-v4-frontend:*)",
+      "Bash(--name ferremas-frontend )",
+      "Bash(--network ferremas-v4_ferremas-network )",
+      "Bash(-p 3001:3000 )",
+      "Bash(-e NODE_ENV=development )",
+      "Bash(-e NEXT_PUBLIC_API_URL=http://localhost:3000 )",
+      "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/src:/app/src )",
+      "Bash(-v /home/ewanskurt/projects/ferremas-v4/frontend/public:/app/public )",
+      "Bash(--restart unless-stopped )"
     ],
     "deny": []
   }

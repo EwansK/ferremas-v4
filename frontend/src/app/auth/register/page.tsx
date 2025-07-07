@@ -29,7 +29,8 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterData & { confirmPassword: string }) => {
     try {
-      const { ...registerData } = data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
       router.push('/'); // Redirect to home page
     } catch {

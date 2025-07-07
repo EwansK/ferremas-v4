@@ -9,7 +9,7 @@ interface User {
   lastname: string;
   email: string;
   role: 'customer' | 'manager' | 'admin';
-  is_active: boolean;
+  active: boolean;
 }
 
 interface UserEditFormProps {
@@ -146,9 +146,9 @@ export default function UserEditForm({
               <p className="text-sm font-medium text-gray-900">{user.name} {user.lastname}</p>
               <p className="text-sm text-gray-500">{user.email}</p>
               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
               }`}>
-                {user.is_active ? 'Activo' : 'Inactivo'}
+                {user.active ? 'Activo' : 'Inactivo'}
               </span>
             </div>
 
