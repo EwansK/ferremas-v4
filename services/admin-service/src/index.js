@@ -41,10 +41,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes (all routes require admin role)
-app.use('/users', authMiddleware.requireAdmin(), userRoutes);
-app.use('/employees', authMiddleware.requireAdmin(), employeeRoutes);
-app.use('/analytics', authMiddleware.requireAdmin(), analyticsRoutes);
+// API Routes (all routes require authentication and admin role)
+app.use('/users', authMiddleware.authenticate, authMiddleware.requireAdmin(), userRoutes);
+app.use('/employees', authMiddleware.authenticate, authMiddleware.requireAdmin(), employeeRoutes);
+app.use('/analytics', authMiddleware.authenticate, authMiddleware.requireAdmin(), analyticsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

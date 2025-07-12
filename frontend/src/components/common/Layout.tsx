@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import CartCounter from '@/components/cart/CartCounter';
 import { 
   HomeIcon, 
   ShoppingBagIcon, 
@@ -79,8 +80,10 @@ export default function Layout({ children }: LayoutProps) {
               )}
             </nav>
 
-            {/* User Menu */}
+            {/* Cart and User Menu */}
             <div className="flex items-center space-x-4">
+              {/* Cart Counter */}
+              <CartCounter />
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">

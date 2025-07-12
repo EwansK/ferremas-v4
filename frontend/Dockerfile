@@ -4,6 +4,10 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
+# Accept build argument for API URL
+ARG NEXT_PUBLIC_API_URL=http://localhost:3000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Install dependencies first (for better caching)
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
@@ -11,7 +15,7 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with environment variable
 RUN npm run build
 
 # Create non-root user for security

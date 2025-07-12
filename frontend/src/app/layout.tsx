@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CartProvider } from '@/contexts/CartContext';
 import Layout from '@/components/common/Layout';
+import CartSidebar from '@/components/cart/CartSidebar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,9 +23,12 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className}>
         <AuthProvider>
-          <Layout>
-            {children}
-          </Layout>
+          <CartProvider>
+            <Layout>
+              {children}
+            </Layout>
+            <CartSidebar />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

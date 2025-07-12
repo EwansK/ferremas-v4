@@ -17,4 +17,4 @@ COPY shared/ ./shared/
 EXPOSE 3001
 
 # Start the service  
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]

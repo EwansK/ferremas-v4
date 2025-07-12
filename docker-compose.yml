@@ -1,174 +1,180 @@
+# Docker Compose configuration for Docker Hub deployment
+# This file uses pre-built images from Docker Hub instead of building locally
+
 services:
-  # PostgreSQL Database
+  # PostgreSQL - Use RDS in production, this is just for testing
   postgres:
     image: postgres:15-alpine
-    container_name: ferremas-postgres
+    container_name: ferremas-postgres-dockerhub
     environment:
-      POSTGRES_DB: ferremas
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: ${DB_NAME:-ferremas}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./sample-data.sql:/docker-entrypoint-initdb.d/02-data.sql
     networks:
       - ferremas-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # Auth Service
+  # Auth Service - FROM DOCKER HUB
   auth-service:
-    build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
-    container_name: ferremas-auth-service
+    image: ${DOCKER_HUB_USERNAME}/ferremas-auth-service:${IMAGE_TAG:-latest}
+    container_name: ferremas-auth-service-dockerhub
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3001
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ferremas
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-ferremas}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres123@postgres:5432/ferremas}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key-change-in-production}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
       AWS_API_URL: ${AWS_API_URL}
       CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
     ports:
-      - "3005:3001"
+      - "3001:3001"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       - ferremas-network
-    volumes:
-      - ./services/auth-service/src:/app/src
     restart: unless-stopped
 
-  # Product Service
+  # Product Service - FROM DOCKER HUB
   product-service:
-    build:
-      context: ./services/product-service
-      dockerfile: Dockerfile
-    container_name: ferremas-product-service
+    image: ${DOCKER_HUB_USERNAME}/ferremas-product-service:${IMAGE_TAG:-latest}
+    container_name: ferremas-product-service-dockerhub
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3002
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ferremas
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-ferremas}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres123@postgres:5432/ferremas}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
       AWS_API_URL: ${AWS_API_URL}
       CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
-      AUTH_SERVICE_URL: http://auth-service:3001
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
     ports:
       - "3002:3002"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       - ferremas-network
-    volumes:
-      - ./services/product-service/src:/app/src
     restart: unless-stopped
 
-  # Manager Service
+  # Manager Service - FROM DOCKER HUB
   manager-service:
-    build:
-      context: ./services/manager-service
-      dockerfile: Dockerfile
-    container_name: ferremas-manager-service
+    image: ${DOCKER_HUB_USERNAME}/ferremas-manager-service:${IMAGE_TAG:-latest}
+    container_name: ferremas-manager-service-dockerhub
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3003
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ferremas
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ferremas
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-ferremas}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres123@postgres:5432/ferremas}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
       AWS_API_URL: ${AWS_API_URL}
       CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
-      AUTH_SERVICE_URL: http://auth-service:3001
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       UPLOAD_PATH: /app/uploads
       MAX_FILE_SIZE: 5242880
+      # S3 Configuration (optional)
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_S3_REGION: ${AWS_S3_REGION}
     ports:
       - "3003:3003"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       - ferremas-network
     volumes:
-      - ./services/manager-service/src:/app/src
       - uploads_data:/app/uploads
     restart: unless-stopped
 
-  # Admin Service
+  # Admin Service - FROM DOCKER HUB
   admin-service:
-    build:
-      context: ./services/admin-service
-      dockerfile: Dockerfile
-    container_name: ferremas-admin-service
+    image: ${DOCKER_HUB_USERNAME}/ferremas-admin-service:${IMAGE_TAG:-latest}
+    container_name: ferremas-admin-service-dockerhub
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3004
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ferremas
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-ferremas}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres123@postgres:5432/ferremas}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
       AWS_API_URL: ${AWS_API_URL}
       CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
-      AUTH_SERVICE_URL: http://auth-service:3001
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
     ports:
       - "3004:3004"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     networks:
       - ferremas-network
-    volumes:
-      - ./services/admin-service/src:/app/src
     restart: unless-stopped
 
-  # API Gateway
-  api-gateway:
-    build:
-      context: ./services/api-gateway
-      dockerfile: Dockerfile
-    container_name: ferremas-api-gateway
+  # Cart Service - FROM DOCKER HUB
+  cart-service:
+    image: ${DOCKER_HUB_USERNAME}/ferremas-cart-service:${IMAGE_TAG:-latest}
+    container_name: ferremas-cart-service-dockerhub
     environment:
-      NODE_ENV: development
-      PORT: 3000
-      AUTH_SERVICE_URL: http://auth-service:3001
-      PRODUCT_SERVICE_URL: http://product-service:3002
-      MANAGER_SERVICE_URL: http://manager-service:3003
-      ADMIN_SERVICE_URL: http://admin-service:3004
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      NODE_ENV: production
+      PORT: 3005
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-ferremas}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres123@postgres:5432/ferremas}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
       AWS_API_URL: ${AWS_API_URL}
       CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
+    ports:
+      - "3005:3005"
+    depends_on:
+      - postgres
+    networks:
+      - ferremas-network
+    restart: unless-stopped
+
+  # API Gateway - FROM DOCKER HUB
+  api-gateway:
+    image: ${DOCKER_HUB_USERNAME}/ferremas-api-gateway:${IMAGE_TAG:-latest}
+    container_name: ferremas-api-gateway-dockerhub
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL:-http://product-service:3002}
+      MANAGER_SERVICE_URL: ${MANAGER_SERVICE_URL:-http://manager-service:3003}
+      ADMIN_SERVICE_URL: ${ADMIN_SERVICE_URL:-http://admin-service:3004}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      AWS_FRONTEND_URL: ${AWS_FRONTEND_URL}
+      AWS_API_URL: ${AWS_API_URL}
+      CUSTOM_DOMAIN: ${CUSTOM_DOMAIN}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
     ports:
       - "3000:3000"
     depends_on:
@@ -179,28 +185,23 @@ services:
     networks:
       - ferremas-network
     volumes:
-      - ./services/api-gateway/src:/app/src
       - uploads_data:/app/uploads
     restart: unless-stopped
 
-  # Frontend (Next.js)
+  # Frontend (Next.js) - FROM DOCKER HUB
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: ferremas-frontend
+    image: ${DOCKER_HUB_USERNAME}/ferremas-frontend:${IMAGE_TAG:-latest}
+    container_name: ferremas-frontend-dockerhub
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${AWS_API_URL:-https://api.your-app.example.com}
+      AWS_INTERNAL_API_URL: ${AWS_INTERNAL_API_URL:-http://api-gateway:3000}
     ports:
       - "3001:3000"
     depends_on:
       - api-gateway
     networks:
       - ferremas-network
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
     restart: unless-stopped
 
 volumes:

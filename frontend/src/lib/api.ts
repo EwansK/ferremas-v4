@@ -344,8 +344,112 @@ class ApiClient {
       this.handleError(error as AxiosError);
     }
   }
+
+  // Cart API methods
+  async getCart(): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.get('/api/cart');
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async addToCart(productId: string, quantity: number): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.post('/api/cart/items', 
+        { product_id: productId, quantity }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async updateCartQuantity(productId: string, quantity: number): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.put(`/api/cart/items/${productId}`, 
+        { quantity }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async removeFromCart(productId: string): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.delete(`/api/cart/items/${productId}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async clearCart(): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.delete('/api/cart');
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async getCartCount(): Promise<ApiResponse<{ count: number }>> {
+    try {
+      const response = await this.client.get('/api/cart/count');
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async validateCart(): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.get('/api/cart/validate');
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async mergeGuestCart(guestItems: unknown[]): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.post('/api/cart/merge', 
+        { guest_cart_items: guestItems }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  async addMultipleToCart(items: { product_id: string; quantity: number }[]): Promise<ApiResponse<unknown>> {
+    try {
+      const response = await this.client.post('/api/cart/items/bulk', 
+        { items }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
 }
 
 // Export singleton instance
 export const apiClient = new ApiClient();
+
+// Export cart API functions for use in CartContext
+export const cartAPI = {
+  getCart: () => apiClient.getCart(),
+  addItem: (productId: string, quantity: number) => apiClient.addToCart(productId, quantity),
+  updateQuantity: (productId: string, quantity: number) => apiClient.updateCartQuantity(productId, quantity),
+  removeItem: (productId: string) => apiClient.removeFromCart(productId),
+  clearCart: () => apiClient.clearCart(),
+  getCount: () => apiClient.getCartCount(),
+  validateCart: () => apiClient.validateCart(),
+  mergeGuestCart: (guestItems: unknown[]) => apiClient.mergeGuestCart(guestItems),
+  addMultiple: (items: { product_id: string; quantity: number }[]) => apiClient.addMultipleToCart(items)
+};
+
 export default apiClient;

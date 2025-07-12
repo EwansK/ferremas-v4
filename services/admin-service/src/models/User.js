@@ -11,13 +11,13 @@ class User {
 
     if (search) {
       paramCount++;
-      whereClause += ` AND (name ILIKE $${paramCount} OR lastname ILIKE $${paramCount} OR email ILIKE $${paramCount})`;
+      whereClause += ` AND (u.name ILIKE $${paramCount} OR u.lastname ILIKE $${paramCount} OR u.email ILIKE $${paramCount})`;
       queryParams.push(`%${search}%`);
     }
 
     if (role) {
       paramCount++;
-      whereClause += ` AND role = $${paramCount}`;
+      whereClause += ` AND r.role_name = $${paramCount}`;
       queryParams.push(role);
     }
 
@@ -28,8 +28,16 @@ class User {
     if (!allowedSortFields.includes(sortBy)) sortBy = 'created_at';
     if (!allowedSortOrders.includes(sortOrder.toUpperCase())) sortOrder = 'DESC';
 
+    // Update sortBy to use table aliases
+    const sortField = sortBy === 'role' ? 'r.role_name' : `u.${sortBy}`;
+
     // Get total count
-    const countQuery = `SELECT COUNT(*) FROM users ${whereClause}`;
+    const countQuery = `
+      SELECT COUNT(*) 
+      FROM users u
+      LEFT JOIN roles r ON u.role_id = r.id
+      ${whereClause}
+    `;
     const countResult = await database.query(countQuery, queryParams);
     const totalItems = parseInt(countResult.rows[0].count);
 
@@ -41,11 +49,12 @@ class User {
 
     const usersQuery = `
       SELECT 
-        id, name, lastname, email, role, active, created_at, 
-        updated_at, last_login_at
-      FROM users 
+        u.id, u.name, u.lastname, u.email, r.role_name as role, u.active, u.created_at, 
+        u.updated_at, u.last_login_at
+      FROM users u
+      LEFT JOIN roles r ON u.role_id = r.id
       ${whereClause}
-      ORDER BY ${sortBy} ${sortOrder}
+      ORDER BY ${sortField} ${sortOrder}
       LIMIT $${paramCount - 1} OFFSET $${paramCount}
     `;
 
@@ -67,7 +76,10 @@ class User {
   // Get user by ID
   static async findById(id) {
     const result = await database.query(
-      'SELECT id, name, lastname, email, role, active, created_at, updated_at, last_login_at FROM users WHERE id = $1',
+      `SELECT u.id, u.name, u.lastname, u.email, r.role_name as role, u.active, u.created_at, u.updated_at, u.last_login_at 
+       FROM users u 
+       LEFT JOIN roles r ON u.role_id = r.id 
+       WHERE u.id = $1`,
       [id]
     );
     return result.rows[0];
@@ -76,7 +88,10 @@ class User {
   // Get user by email
   static async findByEmail(email) {
     const result = await database.query(
-      'SELECT id, name, lastname, email, role, active, created_at, updated_at, last_login_at FROM users WHERE email = $1',
+      `SELECT u.id, u.name, u.lastname, u.email, r.role_name as role, u.active, u.created_at, u.updated_at, u.last_login_at 
+       FROM users u 
+       LEFT JOIN roles r ON u.role_id = r.id 
+       WHERE u.email = $1`,
       [email]
     );
     return result.rows[0];
@@ -84,10 +99,20 @@ class User {
 
   // Update user
   static async updateById(id, updateData) {
-    const allowedFields = ['name', 'lastname', 'email', 'role', 'active'];
+    const allowedFields = ['name', 'lastname', 'email', 'role_id', 'active'];
     const fields = [];
     const values = [];
     let paramCount = 0;
+
+    // Handle role conversion
+    if (updateData.role && !updateData.role_id) {
+      // Convert role name to role_id
+      const roleResult = await database.query('SELECT id FROM roles WHERE role_name = $1', [updateData.role]);
+      if (roleResult.rows[0]) {
+        updateData.role_id = roleResult.rows[0].id;
+      }
+      delete updateData.role;
+    }
 
     for (const [key, value] of Object.entries(updateData)) {
       if (allowedFields.includes(key) && value !== undefined) {

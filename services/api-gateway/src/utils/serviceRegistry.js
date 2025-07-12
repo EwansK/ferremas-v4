@@ -42,14 +42,13 @@ class ServiceRegistry {
       lastCheck: null
     });
 
-    // Cart service commented out until implemented
-    // this.registerService('cart', {
-    //   name: 'cart-service',
-    //   url: process.env.CART_SERVICE_URL || 'http://cart-service:3005',
-    //   healthPath: '/health',
-    //   status: 'unknown', 
-    //   lastCheck: null
-    // });
+    this.registerService('cart', {
+      name: 'cart-service',
+      url: process.env.CART_SERVICE_URL || 'http://cart-service:3005',
+      healthPath: '/health',
+      status: 'unknown', 
+      lastCheck: null
+    });
 
     // Start health checks
     this.startHealthChecks();
@@ -171,10 +170,10 @@ class ServiceRegistry {
       '/api/manager': 'manager',
       
       // Admin routes (auth required) 
-      '/api/admin': 'admin'
+      '/api/admin': 'admin',
       
-      // Cart routes (auth required) - disabled until cart service is implemented
-      // '/api/cart': 'cart'
+      // Cart routes (auth required)
+      '/api/cart': 'cart'
     };
   }
 

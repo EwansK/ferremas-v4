@@ -130,3 +130,9 @@ Thumbs.db
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Claude Code files
+.claude/
+
+# Clean-up folder (non-essential files)
+clean-up/

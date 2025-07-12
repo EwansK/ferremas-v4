@@ -73,7 +73,15 @@
       "Bash(docker container prune:*)",
       "Bash(docker image:*)",
       "Bash(docker volume prune:*)",
-      "Bash(docker:*)"
+      "Bash(docker:*)",
+      "Bash(./build-and-push-dockerhub.sh:*)",
+      "Bash(awk:*)",
+      "Bash(DOCKER_HUB_USERNAME=ewanskurt docker-compose -f docker-compose.dockerhub.yml pull admin-service)",
+      "Bash(DOCKER_HUB_USERNAME=ewanskurt docker-compose -f docker-compose.dockerhub.yml up -d admin-service)",
+      "Bash(DOCKER_HUB_USERNAME=ewanskurt docker-compose -f docker-compose.dockerhub.yml up -d cart-service api-gateway)",
+      "Bash(DOCKER_HUB_USERNAME=ewanskurt docker-compose -f docker-compose.dockerhub.yml down)",
+      "Bash(DOCKER_HUB_USERNAME=ewanskurt docker-compose -f docker-compose.dockerhub.yml up -d)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
