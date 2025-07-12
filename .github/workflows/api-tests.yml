@@ -1,0 +1,145 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Newman
+      run: npm install -g newman
+      
+    - name: Run API Tests and Capture Output
+      run: |
+        echo "Testing API at: ${{ secrets.API_BASE_URL || 'http://18.212.15.99:3000' }}"
+        echo "========================================"
+        
+        # Run Newman and capture both stdout and stderr
+        newman run Ferremas_API_Tests.postman_collection.json \
+          --env-var "base_url=${{ secrets.API_BASE_URL || 'http://18.212.15.99:3000' }}" \
+          --reporters cli,json \
+          --reporter-json-export newman-results.json \
+          --verbose 2>&1 | tee newman-output.txt || true
+        
+        echo "========================================"
+        echo "Newman execution completed"
+        ls -la newman-*
+        
+    - name: Create Detailed HTML Report
+      run: |
+        cat > api-test-results.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Ferremas API Test Results</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+                .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+                .header h1 { margin: 0; font-size: 2em; }
+                .header p { margin: 5px 0; opacity: 0.9; }
+                .section { margin-bottom: 30px; }
+                .section h2 { color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+                .test-output { background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px; overflow-x: auto; white-space: pre-wrap; line-height: 1.4; }
+                .success { color: #48bb78; } .fail { color: #f56565; } .warning { color: #ed8936; }
+                .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+                .stat-card { background: #f7fafc; padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid #667eea; }
+                .stat-number { font-size: 2em; font-weight: bold; color: #667eea; }
+                .json-data { background: #f7fafc; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🚀 Ferremas API Test Results</h1>
+                    <p><strong>API Endpoint:</strong> ${{ secrets.API_BASE_URL || 'http://18.212.15.99:3000' }}</p>
+                    <p><strong>Run Date:</strong> $(date)</p>
+                    <p><strong>GitHub Run:</strong> ${{ github.run_id }}</p>
+                </div>
+        EOF
+        
+        echo '                <div class="section">' >> api-test-results.html
+        echo '                    <h2>📊 Test Execution Output</h2>' >> api-test-results.html
+        echo '                    <div class="test-output">' >> api-test-results.html
+        
+        if [ -f newman-output.txt ]; then
+            # Clean up the output and add it to HTML
+            sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' newman-output.txt >> api-test-results.html
+        else
+            echo "No Newman output file found" >> api-test-results.html
+        fi
+        
+        cat >> api-test-results.html << 'EOF'
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>📋 Raw JSON Results</h2>
+                    <div class="json-data">
+        EOF
+        
+        if [ -f newman-results.json ]; then
+            echo "JSON Results available:" >> api-test-results.html
+            cat newman-results.json >> api-test-results.html
+        else
+            echo "No JSON results file generated" >> api-test-results.html
+        fi
+        
+        cat >> api-test-results.html << 'EOF'
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>🔗 Additional Resources</h2>
+                    <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">View Full GitHub Actions Log</a></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+        echo "HTML report generated:"
+        ls -la api-test-results.html
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-test-results
+        path: |
+          api-test-results.html
+          newman-output.txt
+          newman-results.json
+        retention-days: 30
+        if-no-files-found: warn
+        
+    - name: Comment PR with Test Results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          if (fs.existsSync('api-test-results.html')) {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ API tests completed! Check the test results in the artifacts.'
+            });
+          }
